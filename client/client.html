@@ -8,10 +8,49 @@
     const handleResponse = (response) => {
       const content = document.querySelector('#content');
       
+      switch(response.status) {
+        case 200:
+          content.innerHTML = `<b>success</b>`;
+          break;
+
+        case 201:
+          content.innerHTML = `<b>created</b>`;
+          break;
+
+        case 204:
+          content.innerHTML = `<b>updated (no content)</b>`; //204 has no body, if no return here response.json() errors
+          return;
+
+        case 400:
+          content.innerHTML = `<b>bad request</b>`;
+
+        default:
+          content.innerHTML = `<p>status code not implemented by client</p>`;
+          break;
+      }
+
+      const obj = await response.json();
+      if(obj.message) {
+        content.innerHTML += `<p>${obj.message}</p>`;
+      }
     };
 
-    const sendPost = (nameForm) => {
+    const sendPost = async (nameForm) => {
+      const name = nameform.querySelector('#nameField').value;
+      const age = nameForm.querySelector('#ageField').value;
 
+      const formData = `name=${name}&age=${age}`;
+
+      const response = await fetch('/addUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-ww-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      handleResponse(response);
     };
 
     const init = () => {
